@@ -2,24 +2,18 @@ import React from 'react';
 import css from './ContactItem.module.css';
 import propTypes from 'prop-types';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-import { fetchDeleteContactsThunk } from 'redux/contactsOperations/contactsOperations';
-import { getLoading } from 'redux/contactsSlice/contactsSlice';
+import { useDeleteContactRTKMutation } from 'redux/RTKContactsApi/ContactsApi';
 
 const ContactItem = ({ id, name, number }) => {
-  const dispatch = useDispatch();
-  const loading = useSelector(getLoading);
+  const [deleteContactsRTK, { isLoading }] = useDeleteContactRTKMutation();
 
   return (
     <li className={css.contactList__item}>
       <span className={css.contactList__text}>{`${name}: ${number}`}</span>
       <button
         className={css.contactList__button}
-        onClick={() => {
-          dispatch(fetchDeleteContactsThunk({ id }));
-        }}
-        disabled={loading ? true : false}
+        onClick={async () => await deleteContactsRTK(id).unwrap()}
+        disabled={isLoading}
       >
         Delete
       </button>

@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import css from './contactForm.module.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { getContacts } from 'redux/contactsSlice/contactsSlice';
-
-import { fetchAddContactThunk } from 'redux/contactsOperations/contactsOperations';
+import {
+  useGetContactsRTKQuery,
+  useAddContactRTKMutation,
+} from 'redux/RTKContactsApi/ContactsApi';
 
 const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const contacts = useSelector(getContacts);
-  const dispatch = useDispatch();
+
+  const [addContactRTK] = useAddContactRTKMutation();
+  const { data = [] } = useGetContactsRTKQuery();
 
   const handleImputChange = event => {
     const { name, value } = event.currentTarget;
@@ -25,10 +26,10 @@ const ContactForm = () => {
   };
 
   const checkingAddedContact = outName => {
-    return contacts.find(({ name }) => name === outName);
+    return data.find(({ name }) => name === outName);
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
     const contact = {
       name,
@@ -37,7 +38,8 @@ const ContactForm = () => {
     const newContact = checkingAddedContact(name);
     newContact
       ? alert(`${newContact.name} is already in contacts`)
-      : dispatch(fetchAddContactThunk(contact));
+      : await addContactRTK(contact).unwrap();
+
     reset();
   };
 
