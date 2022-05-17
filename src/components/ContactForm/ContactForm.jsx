@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import css from './contactForm.module.css';
+import { checkingAddedContact } from 'utils/checkingAddedContact';
 import {
   useGetContactsRTKQuery,
   useAddContactRTKMutation,
@@ -25,17 +26,13 @@ const ContactForm = () => {
     }
   };
 
-  const checkingAddedContact = outName => {
-    return data.find(({ name }) => name === outName);
-  };
-
   const handleSubmit = async event => {
     event.preventDefault();
     const contact = {
       name,
       number,
     };
-    const newContact = checkingAddedContact(name);
+    const newContact = checkingAddedContact(name, data);
     newContact
       ? alert(`${newContact.name} is already in contacts`)
       : await addContactRTK(contact).unwrap();
